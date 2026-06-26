@@ -64,8 +64,10 @@ class ChatViewModel: ObservableObject {
                     } else {
                         // Update the latest assistant message with new content
                         if assistantMessageIndex < messages.count {
-                            messages[assistantMessageIndex].content += response.message.content
-                            messages[assistantMessageIndex].timestamp = Date()
+                            // Instead of modifying the message directly, we replace it with a new one
+                            let currentMessage = messages[assistantMessageIndex]
+                            let updatedMessage = ChatMessage(role: currentMessage.role, content: currentMessage.content + response.message.content)
+                            messages[assistantMessageIndex] = updatedMessage
                         }
                     }
                 }

@@ -39,9 +39,6 @@ class ChatViewModel: ObservableObject {
         let assistantMessage = ChatMessage(role: "assistant", content: "")
         messages.append(assistantMessage)
         
-        // Get the last assistant message for updating
-        let assistantMessageIndex = messages.count - 1
-        
         do {
             // Fetch models to get the selected model
             let models = try await ollamaService.fetchModels()
@@ -62,12 +59,12 @@ class ChatViewModel: ObservableObject {
                         isLoading = false
                         break
                     } else {
-                        // Update the latest assistant message with new content
-                        if assistantMessageIndex < messages.count {
-                            // Instead of modifying the message directly, we replace it with a new one
-                            let currentMessage = messages[assistantMessageIndex]
+                        // Update the last assistant message with new content
+                        // We need to find the assistant message and update it
+                        if let lastAssistantIndex = messages.lastIndex(where: { $0.role == "assistant" }) {
+                            let currentMessage = messages[lastAssistantIndex]
                             let updatedMessage = ChatMessage(role: currentMessage.role, content: currentMessage.content + response.message.content)
-                            messages[assistantMessageIndex] = updatedMessage
+                            messages[lastAssistantIndex] = updatedMessage
                         }
                     }
                 }

@@ -96,18 +96,26 @@ class OllamaService: ObservableObject {
         
         return AsyncStream<ChatResponse> { continuation in
             Task {
-                for try await line in streamingData.lines {
-                    if line.isEmpty { continue }
-                    
-                    do {
-                        let response = try JSONDecoder().decode(ChatResponse.self, from: line.data(using: .utf8)!)
-                        continuation.yield(response)
-                    } catch {
-                        // If we can't decode one line, continue with others
-                        print("Error decoding line: \(error)")
+                do {
+                    for try await line in streamingData.lines {
+                        if line.isEmpty { continue }
+                        
+                        // Handle potential JSON parsing errors
+                        if let data = line.data(using: .utf8) {
+                            do {
+                                let response = try JSONDecoder().decode(ChatResponse.self, from: data)
+                                continuation.yield(response)
+                            } catch {
+                                print("Error decoding line: \(error) for line: \(line)")
+                                // Continue with other lines if one fails to parse
+                            }
+                        }
                     }
+                    continuation.finish()
+                } catch {
+                    print("Error in streaming data: \(error)")
+                    continuation.finish()
                 }
-                continuation.finish()
             }
         }
     }

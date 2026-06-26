@@ -15,7 +15,6 @@ class ChatViewModel: ObservableObject {
     @Published var userPrompt = ""
     @Published var errorMessage: String?
     
-    private var cancellables = Set<AnyCancellable>()
     private let ollamaService: OllamaService
     
     init(ollamaService: OllamaService = .init()) {
@@ -51,7 +50,7 @@ class ChatViewModel: ObservableObject {
                     messages: allMessages
                 )
                 
-                // Process the streaming response
+                // Process the streaming response - simplified approach
                 for await response in stream {
                     if response.done {
                         // End of response
@@ -60,10 +59,10 @@ class ChatViewModel: ObservableObject {
                         break
                     } else {
                         // Update the last assistant message with new content
-                        // We need to find the assistant message and update it
                         if let lastAssistantIndex = messages.lastIndex(where: { $0.role == "assistant" }) {
-                            let currentMessage = messages[lastAssistantIndex]
-                            let updatedMessage = ChatMessage(role: currentMessage.role, content: currentMessage.content + response.message.content)
+                            // Create new message with updated content
+                            var updatedMessage = messages[lastAssistantIndex]
+                            updatedMessage.content += response.message.content
                             messages[lastAssistantIndex] = updatedMessage
                         }
                     }

@@ -8,14 +8,21 @@
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject private var ollamaService = OllamaService()
+    @StateObject private var chatViewModel = ChatViewModel()
+    @StateObject private var modelViewModel = ModelViewModel()
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, Bob!")
+        NavigationStack {
+            if ollamaService.baseURL.isEmpty {
+                OnboardingView()
+            } else {
+                ChatView()
+            }
         }
-        .padding()
+        .environmentObject(ollamaService)
+        .environmentObject(chatViewModel)
+        .environmentObject(modelViewModel)
     }
 }
 

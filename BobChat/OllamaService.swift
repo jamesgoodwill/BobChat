@@ -127,7 +127,7 @@ struct OllamaTagsResponse: Codable {
     let models: [OllamaModel]
 }
 
-struct ChatMessage: Identifiable, Codable {
+struct ChatMessage: Identifiable, Codable, Equatable {
     let id = UUID()
     var role: String // "user" or "assistant"
     var content: String
@@ -139,6 +139,7 @@ struct ChatMessage: Identifiable, Codable {
         self.timestamp = Date()
     }
 }
+
 
 
 struct ChatRequest: Codable {
